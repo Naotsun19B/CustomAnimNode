@@ -5,7 +5,7 @@
 #include "BoneControllers/AnimNode_ModifyBone.h"
 #include "AnimNode_MyTransformBone.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintInternalUseOnly)
 struct CUSTOMANIMNODE_API FAnimNode_MyTransformBone : public FAnimNode_Base
 {
 	GENERATED_USTRUCT_BODY()
@@ -13,6 +13,12 @@ struct CUSTOMANIMNODE_API FAnimNode_MyTransformBone : public FAnimNode_Base
 public:
 	UPROPERTY(EditAnywhere, Category = "Links")
 		FPoseLink SourcePose;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault))
+		FVector Translation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Settings", meta = (PinShownByDefault))
+		TEnumAsByte<EBoneModificationMode> TranslationMode;
 
 private:
 	FAnimNode_ConvertLocalToComponentSpace LocalToComponentNode;

@@ -12,11 +12,7 @@ public class CustomAnimNode : ModuleRules
 			new string[]
 			{
 				"Core",
-                "CoreUObject",
-                "Engine",
-                "AnimGraph",
                 "AnimGraphRuntime",
-                "BlueprintGraph",
 			}
 			);
 			
@@ -24,9 +20,10 @@ public class CustomAnimNode : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-                "AnimGraph",
-                "AnimGraphRuntime",
-                "BlueprintGraph",
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore",
             }
 			);
 	}

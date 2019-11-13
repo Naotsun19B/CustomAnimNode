@@ -22,8 +22,8 @@ void FAnimNode_MyTransformBone::Initialize_AnyThread(const FAnimationInitializeC
 	//Transform(Modify) Bone ƒm[ƒh‚ÅRootBone‚ð­‚µã‚É‚ ‚°‚é
 	ModifyBoneNode.BoneToModify.BoneName = FName("Root");
 	ModifyBoneNode.BoneToModify.Initialize(Context.AnimInstanceProxy->GetSkeleton());
-	ModifyBoneNode.Translation = FVector(0, 0, 100);
-	ModifyBoneNode.TranslationMode = BMM_Replace;
+	ModifyBoneNode.Translation = Translation;
+	ModifyBoneNode.TranslationMode = TranslationMode;
 
 	ComponentToLocalNode.Initialize_AnyThread(Context);
 }

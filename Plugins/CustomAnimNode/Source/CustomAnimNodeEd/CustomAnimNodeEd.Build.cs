@@ -11,22 +11,22 @@ public class CustomAnimNodeEd : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-                "CustomAnimNode",
                 "Core",
                 "CoreUObject",
                 "Engine",
-                "BlueprintGraph",
-                "AnimGraph",
-			}
+                "CustomAnimNode",
+            }
 			);
 			
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+                "AnimGraph",
+                "BlueprintGraph",
+                "Persona",
 				"UnrealEd",
-                "GraphEditor",
-                "PropertyEditor",
-                "EditorStyle",
+                "AnimGraphRuntime",
+                "SlateCore",
 			}
 			);
 	}

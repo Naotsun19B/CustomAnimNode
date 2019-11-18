@@ -3,52 +3,33 @@
 #include "Animation/AnimInstanceProxy.h"
 #include "Animation/AnimSequence.h"
 
-FAnimNode_MyBlendAnim::FAnimNode_MyBlendAnim()
+FAnimNode_MyBlendAnimInternal::FAnimNode_MyBlendAnimInternal()
 	: AnimNode_1()
 	, AnimNode_2()
 	, AnimNode_3()
-	, LayeredBoneBlendNode()
 {
 
 }
 
-void FAnimNode_MyBlendAnim::Initialize_AnyThread(const FAnimationInitializeContext& Context)
+void FAnimNode_MyBlendAnimInternal::Initialize_AnyThread(const FAnimationInitializeContext& Context)
 {
 	FAnimNode_Base::Initialize_AnyThread(Context);
 	AnimNode_1.Initialize_AnyThread(Context);
 	AnimNode_2.Initialize_AnyThread(Context);
 	AnimNode_3.Initialize_AnyThread(Context);
-	LayeredBoneBlendNode.Initialize_AnyThread(Context);
 	AnimNode_1.Sequence = Animation_1;
 	AnimNode_2.Sequence = Animation_2;
 	AnimNode_3.Sequence = Animation_3;
-	LayeredBoneBlendNode.BasePose = SourcePose;
-
-	FBranchFilter branchFilter;
-	branchFilter.BoneName = BoneToModify.BoneName;
-	branchFilter.BlendDepth = 0;
-
-	FInputBlendPose layerSetup;
-	layerSetup.BranchFilters.Add(branchFilter);
-
-	LayeredBoneBlendNode.LayerSetup.Add(layerSetup);
-	LayeredBoneBlendNode.BlendWeights.Add(AlphaBase);
 }
 
-void FAnimNode_MyBlendAnim::CacheBones_AnyThread(const FAnimationCacheBonesContext& Context)
-{
-	LayeredBoneBlendNode.CacheBones_AnyThread(Context);
-}
-
-void FAnimNode_MyBlendAnim::Update_AnyThread(const FAnimationUpdateContext& Context)
+void FAnimNode_MyBlendAnimInternal::Update_AnyThread(const FAnimationUpdateContext& Context)
 {
 	AnimNode_1.UpdateAssetPlayer(Context);
 	AnimNode_2.UpdateAssetPlayer(Context);
 	AnimNode_3.UpdateAssetPlayer(Context);
-	LayeredBoneBlendNode.Update_AnyThread(Context);
 }
 
-void FAnimNode_MyBlendAnim::Evaluate_AnyThread(FPoseContext& Output)
+void FAnimNode_MyBlendAnimInternal::Evaluate_AnyThread(FPoseContext& Output)
 {
 	const FBoneContainer* RequiredBones = &Output.AnimInstanceProxy->GetRequiredBones();
 
@@ -93,16 +74,66 @@ void FAnimNode_MyBlendAnim::Evaluate_AnyThread(FPoseContext& Output)
 	
 	//二つのアニメーションをブレンド
 	FAnimationRuntime::BlendTwoPosesTogether(
-		pose_1, pose_2, curve_1, curve_2, Alpha_1, pose_1_2, curve_1_2
+		pose_1, pose_2, curve_1, curve_2, 1 - Alpha_1, pose_1_2, curve_1_2
 	);
 
 	//１回目の結果と三つ目のアニメーションをブレンド
 	FAnimationRuntime::BlendTwoPosesTogether(
-		pose_1_2, pose_3, curve_1_2, curve_3, Alpha_2, Output.Pose, Output.Curve
+		pose_1_2, pose_3, curve_1_2, curve_3, 1 - Alpha_2, Output.Pose, Output.Curve
 	);
+}
+
+FAnimNode_MyBlendAnim::FAnimNode_MyBlendAnim()
+	: InternalNode()
+	, LayeredBoneBlendNode()
+{
+
+}
+
+void FAnimNode_MyBlendAnim::Initialize_AnyThread(const FAnimationInitializeContext& Context)
+{
+	FAnimNode_Base::Initialize_AnyThread(Context);
+
+	InternalNode.AlphaBase = AlphaBase;
+	InternalNode.Alpha_1 = Alpha_1;
+	InternalNode.Alpha_2 = Alpha_2;
+	InternalNode.Animation_1 = Animation_1;
+	InternalNode.Animation_2 = Animation_2;
+	InternalNode.Animation_3 = Animation_3;
+
+	InternalNode.Initialize_AnyThread(Context);
+
+
+	FBranchFilter branchFilter;
+	branchFilter.BoneName = BoneToModify.BoneName;
+	branchFilter.BlendDepth = 0;
+	FInputBlendPose blendPose;
+	blendPose.BranchFilters.Add(branchFilter);
+	LayeredBoneBlendNode.LayerSetup.Add(blendPose);
+
+	LayeredBoneBlendNode.BasePose = SourcePose;
+
+	FPoseLink internalPose;
+	internalPose.SetLinkNode(&InternalNode);
+	internalPose.Initialize(Context);
+	LayeredBoneBlendNode.BlendPoses.Add(internalPose);
+
+	LayeredBoneBlendNode.BlendWeights.Add(AlphaBase);
 	
-//	FPoseLink blendedPose;
-//	LayeredBoneBlendNode.BlendPoses.Empty();
-//	LayeredBoneBlendNode.BlendPoses.Add(blendedPose);
-//	LayeredBoneBlendNode.Evaluate_AnyThread(Output);
+	LayeredBoneBlendNode.Initialize_AnyThread(Context);
+}
+
+void FAnimNode_MyBlendAnim::CacheBones_AnyThread(const FAnimationCacheBonesContext& Context)
+{
+	LayeredBoneBlendNode.CacheBones_AnyThread(Context);
+}
+
+void FAnimNode_MyBlendAnim::Update_AnyThread(const FAnimationUpdateContext& Context)
+{
+	LayeredBoneBlendNode.Update_AnyThread(Context);
+}
+
+void FAnimNode_MyBlendAnim::Evaluate_AnyThread(FPoseContext& Output)
+{
+	LayeredBoneBlendNode.Evaluate_AnyThread(Output);
 }

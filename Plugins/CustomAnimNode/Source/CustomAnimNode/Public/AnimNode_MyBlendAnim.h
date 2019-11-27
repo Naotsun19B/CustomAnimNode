@@ -1,46 +1,17 @@
 #pragma once
 
 #include "Animation/AnimNodeBase.h"
-#include "Animation/AnimNode_SequencePlayer.h"
-#include "AnimationRuntime.h"
 #include "AnimNode_LayeredBoneBlend.h"
+#include "AnimNode_MyBlendAnimInternal.h"
 #include "AnimNode_MyBlendAnim.generated.h"
 
-USTRUCT(BlueprintInternalUseOnly)
-struct CUSTOMANIMNODE_API FAnimNode_MyBlendAnimInternal : public FAnimNode_Base
+UENUM(BlueprintType)
+enum class EAnimState : uint8
 {
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float AlphaBase;
-
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float Alpha_1;
-
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float Alpha_2;
-
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_1;
-
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_2;
-
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_3;
-
-private:
-	FAnimNode_SequencePlayer AnimNode_1;
-	FAnimNode_SequencePlayer AnimNode_2;
-	FAnimNode_SequencePlayer AnimNode_3;
-
-public:
-	FAnimNode_MyBlendAnimInternal();
-
-	virtual void Initialize_AnyThread(const FAnimationInitializeContext& Context) override;
-	virtual void Update_AnyThread(const FAnimationUpdateContext& Context) override;
-	virtual void Evaluate_AnyThread(FPoseContext& Output) override;
+	AS_State1	UMETA(DisplayName = "State1"),
+	AS_State2	UMETA(DisplayName = "State2"),
+	AS_State3	UMETA(DisplayName = "State3"),
+	AS_Unknown	UMETA(DisplayName = "Unknown")
 };
 
 USTRUCT(BlueprintInternalUseOnly)
@@ -55,14 +26,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Modify Target")
 		FBoneReference BoneToModify;
 
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float AlphaBase;
+	UPROPERTY(EditAnywhere, Category = "State", meta = (PinShownByDefault))
+		EAnimState AnimState = EAnimState::AS_Unknown;
 
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float Alpha_1;
-
-	UPROPERTY(EditAnywhere, Category = "Alpha")
-		float Alpha_2;
+	UPROPERTY(EditAnywhere, Category = "State")
+		float InterpSpeed = 0.f;
 
 	UPROPERTY(EditAnywhere, Category = "Animation Asset")
 		UAnimSequence* Animation_1;
@@ -76,6 +44,9 @@ public:
 private:
 	FAnimNode_MyBlendAnimInternal InternalNode;
 	FAnimNode_LayeredBoneBlend LayeredBoneBlendNode;
+	float BeforeFrameIsState2 = 0.f;
+	float BeforeFrameIsState3 = 0.f;
+	float BeforeFrameAlpha = 0.f;
 
 public:
 	FAnimNode_MyBlendAnim();
@@ -84,4 +55,7 @@ public:
 	virtual void CacheBones_AnyThread(const FAnimationCacheBonesContext& Context) override;
 	virtual void Update_AnyThread(const FAnimationUpdateContext& Context) override;
 	virtual void Evaluate_AnyThread(FPoseContext& Output) override;
+
+private:
+	void GetHandState(float DeltaTime, float& IsState2, float& IsState3, float& Alpha);
 };

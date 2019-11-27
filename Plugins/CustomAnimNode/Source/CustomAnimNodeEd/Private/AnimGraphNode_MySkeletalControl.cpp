@@ -43,7 +43,12 @@ FText UAnimGraphNode_MySkeletalControl::GetNodeTitle(ENodeTitleType::Type TitleT
 void UAnimGraphNode_MySkeletalControl::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+	ReconstructNode();
+}
 
+void UAnimGraphNode_MySkeletalControl::PreEditChange(UProperty* PropertyAboutToChange)
+{
+	Super::PreEditChange(PropertyAboutToChange);
 	ReconstructNode();
 }
 

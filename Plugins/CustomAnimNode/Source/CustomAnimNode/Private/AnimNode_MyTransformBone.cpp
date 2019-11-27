@@ -35,6 +35,9 @@ void FAnimNode_MyTransformBone::CacheBones_AnyThread(const FAnimationCacheBonesC
 
 void FAnimNode_MyTransformBone::Update_AnyThread(const FAnimationUpdateContext& Context)
 {
+	//“ü—Íƒsƒ“‚ğXV
+	GetEvaluateGraphExposedInputs().Execute(Context);
+
 	ComponentToLocalNode.Update_AnyThread(Context);
 }
 

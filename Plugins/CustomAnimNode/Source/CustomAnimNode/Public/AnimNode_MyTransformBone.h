@@ -8,7 +8,7 @@
 USTRUCT(BlueprintInternalUseOnly)
 struct CUSTOMANIMNODE_API FAnimNode_MyTransformBone : public FAnimNode_Base
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Links")

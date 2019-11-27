@@ -26,4 +26,16 @@ FText UAnimGraphNode_MyTransformBone::GetTooltipText() const
 	return LOCTEXT("AnimGraphNode_MyTransformBone_Tooltip", "This is my first custom anim node.");
 }
 
+void UAnimGraphNode_MyTransformBone::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	ReconstructNode();
+}
+
+void UAnimGraphNode_MyTransformBone::PreEditChange(UProperty* PropertyAboutToChange)
+{
+	Super::PreEditChange(PropertyAboutToChange);
+	ReconstructNode();
+}
+
 #undef LOCTEXT_NAMESPACE

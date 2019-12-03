@@ -11,14 +11,9 @@ struct CUSTOMANIMNODE_API FAnimNode_MyBlendAnimInternal : public FAnimNode_Base
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_1;
-
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_2;
-
-	UPROPERTY(EditAnywhere, Category = "Animation Asset")
-		UAnimSequence* Animation_3;
+	UAnimSequence* Animation_1;
+	UAnimSequence* Animation_2;
+	UAnimSequence* Animation_3;
 
 	float IsState2 = 0.f;
 	float IsState3 = 0.f;

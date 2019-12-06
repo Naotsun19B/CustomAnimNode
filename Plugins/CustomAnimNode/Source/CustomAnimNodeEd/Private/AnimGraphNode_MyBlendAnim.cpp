@@ -12,7 +12,26 @@ UAnimGraphNode_MyBlendAnim::UAnimGraphNode_MyBlendAnim(const FObjectInitializer&
 
 FText UAnimGraphNode_MyBlendAnim::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	return LOCTEXT("AnimGraphNode_MyBlendAnim_Title", "My Blend Anim");
+	if ((TitleType == ENodeTitleType::ListView || TitleType == ENodeTitleType::MenuTitle) && (Node.BoneToModify.BoneName == NAME_None))
+	{
+		return LOCTEXT("MyBlendAnim", "My Blend Anim");
+	}
+	else
+	{
+		FFormatNamedArguments Args;
+		Args.Add(TEXT("ControllerDescription"), LOCTEXT("MyBlendAnim", "My Blend Anim"));
+		Args.Add(TEXT("BoneName"), FText::FromName(Node.BoneToModify.BoneName));
+
+		if (TitleType == ENodeTitleType::ListView || TitleType == ENodeTitleType::MenuTitle)
+		{
+			CachedNodeTitles.SetCachedTitle(TitleType, FText::Format(LOCTEXT("AnimGraphNode_MyBlendAnim_ListTitle", "{ControllerDescription} - Bone: {BoneName}"), Args), this);
+		}
+		else
+		{
+			CachedNodeTitles.SetCachedTitle(TitleType, FText::Format(LOCTEXT("AnimGraphNode_MyBlendAnim_Title", "{ControllerDescription}\nBone: {BoneName}"), Args), this);
+		}
+	}
+	return CachedNodeTitles[TitleType];
 }
 
 FLinearColor UAnimGraphNode_MyBlendAnim::GetNodeTitleColor() const
@@ -22,7 +41,10 @@ FLinearColor UAnimGraphNode_MyBlendAnim::GetNodeTitleColor() const
 
 FText UAnimGraphNode_MyBlendAnim::GetTooltipText() const
 {
-	return LOCTEXT("AnimGraphNode_MyBlendAnim_Tooltip", "My Blend Anim");
+	return LOCTEXT("AnimGraphNode_MyBlendAnim_Tooltip",
+		"Blends hand animation based on AnimState.\n"
+		"All child bones of specified bone will be blended."
+	);
 }
 
 void UAnimGraphNode_MyBlendAnim::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
